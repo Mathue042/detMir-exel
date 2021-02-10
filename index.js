@@ -3,14 +3,20 @@ const puppeteer = require('puppeteer');
 const chalk = require('chalk');
 const fs = require("fs");
 // require('events').EventEmitter.defaultMaxListeners = Infinity;
+
 const xlsx = require('xlsx')
 var wb = xlsx.readFile(process.argv[3])
 var ws = wb.Sheets['Шаблон для поставщика']
+
+var initWB = xlsx.readFile('initValues.xlsx')
+var initWS = initWB.Sheets['Лист1']
 
 var arrayOfChar = ['A','B','C','D','E','F','G','H','I','G',
 'K','L','M', 'N', 'O','P','Q','R','S','T','U','V','W','X','Y','Z','AA','AB',
 'AC','AD','AE','AF','AG','AH','AI','AJ','AK','AL','AM','AN','AO','AP','AQ','AR','AS',
 'AT','AU','AV','AW','AX','AY','AZ']
+
+
 
 const LAUNCH_PUPPETEER_OPTS = {
     args: [
@@ -40,7 +46,6 @@ var finalContent = ['костыль']
 var links = []
 var photos = []
 
-// xlsxChange(bb.x)
 
 async function main(){
     try {
@@ -72,7 +77,10 @@ async function main(){
         console.log(err);
     }
 }
+(async () =>{
+await getClassValues(initWS)
 main()
+})()
 
 
 async function toysParams(html){
@@ -500,7 +508,6 @@ async function beautyNum(number, jopa = false){
 }
 
 async function getHrefCard(html){
-    console.log('pezda');
     const $ = cheerio.load(html)
     $("a[class='An AM']").each( function huy(){
        
@@ -521,10 +528,43 @@ async function getPageContent(uri){
         return content;
 }
 
-async function xlsxChange(filename, data){
-    var workbook = XLSX.readFile(filename)
-    var firsSheetName = workbook.SheetNames[1]
-    var workSheet = workbook.Sheets[firsSheetName]
+async function getClassValues(ws){
+  const link = ws['A2'].v
+  const nameToy = ws['B2'].v
+  const artikul = 'Артикул'
+//   ws['C2'].v
+  const photoLink = ws['D2'].v
+  const price = ws['E2'].v
+  const toyStats = ws['F2'].v
+  const bigLink =ws['G2'].v
+  
+  var bigContent = await getPageContent(bigLink)
+  var bigLinkClass = bigContent.split(link)[2]
+  bigLinkClass = bigLinkClass.split(`"`)[2]
+
+  var content = await getPageContent(link)
+  var nameClass = content.split(nameToy)[content.split(nameToy).length - 2]
+  nameClass = nameClass.split(`"`)[nameClass.split(`"`).length - 2]
+//   const $ = cheerio.load(content)
+//   var n = $('._7J').first().text()
+// //   var g = [
+// // ]
+// //   $("img[class='_6_7']").each( function huy(){
+// //     var photoURL = $(this).attr("src")
+// //     g.push(photoURL)
+// //    console.log(g);
+// // })
+//   console.log(n);
+  var artikulClass = content.split(artikul)[0].split(`<div>`)[content.split(artikul)[0].split(`<div>`).length - 1]
+  artikulClass = artikulClass.split(`"`)[3]
+  var photoLinkClass = content.split(photoLink)[content.split(photoLink).length-2]
+  photoLinkClass = photoLinkClass.split(`"`)[photoLinkClass.split(`"`).length - 3]
+  var priceClass = '4 799&nbsp;₽'
+  priceClass = content.split(priceClass)[0]
+//   priceClass = priceClass.split(`"`)[priceClass.split(`"`).length - 2]
+  console.log(priceClass);
+  
+
 }
 
 var vv = `5.10.15
