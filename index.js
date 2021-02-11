@@ -36,7 +36,7 @@ const LAUNCH_PUPPETEER_OPTS = {
   };
 
 var site = process.argv[2]
-var page = 'page/1'
+var page = 'page/3'
 var toys = []
 var finalPrice = 0
 var finalOldPrice = 0
@@ -46,6 +46,13 @@ var finalContent = ['костыль']
 var links = []
 var photos = []
 
+var priceClass = 0
+var descriptionClass = 0
+var toyStatsClass = 0
+var nameClass = 0
+var artikulClass = 0
+var bigLinkClass = 0
+var photoLinkClass = 0
 
 async function main(){
     try {
@@ -85,7 +92,7 @@ main()
 
 async function toysParams(html){
     const $ = cheerio.load(html)
-    var n = $('.jF').first().text()
+    var n = $(`.${nameClass}`).first().text()
     var na = n.replace(/[0-9]/g, '');
     exceptionDictionary.forEach(el=>{
         if (na.includes(el)){
@@ -95,16 +102,15 @@ async function toysParams(html){
     })
     na = na.replace(/[A-Z]/g, '')
     var name = na
-    var artikul = $('._7a').text()
+    var artikul = $(`.${artikulClass}`).text()
     var pht = []
-    $("img[class='_6_8']").each( function huy(){
+    $(`img[class='${photoLinkClass}']`).each( function huy(){
         var photoURL = $(this).attr("src")
        pht.push(photoURL)
-       console.log(pht);
     })
     photos.push(pht)
     var newArt= artikul.substring(artikul.indexOf("К"), artikul.indexOf("л")+2)
-    var price = $('._8f')
+    var price = $(`.${priceClass}`)
     .first()
     .text()
     .replace(/[^,\d]/g, "")
@@ -113,7 +119,7 @@ async function toysParams(html){
     
     var NDS = 'Не облагается'
     var comerType = 'мягкая игрушка'
-    var toyStats = $('.nR').text()
+    var toyStats = $(`.${toyStatsClass}`).text()
     var newStats = toyStats.substring(toyStats.indexOf(" x ")-5, toyStats.indexOf(" x ")+14)
     var b = newStats.split(' ')
     b.splice(1,1)
@@ -134,7 +140,7 @@ async function toysParams(html){
     xyz.sort((a, b)=> b - a)
     var color = 'разноцветный'
     var age = 'для всех возростов'
-    var description = $('._7j').text()
+    var description = $(`.${descriptionClass}`).text()
     ages.forEach(el=>{
         if (description.includes(el)){
             age = 'от '+el+' лет'
@@ -243,6 +249,8 @@ async function toysParams(html){
         NDS,
         comerType,
         description: description.split(toyStats)[0],
+        mainPhoto: photos[photos.length -1][0],
+        otherPhotos: photos[photos.length -1],
         height: xyz[2].toString(),
         length: xyz[0].toString(),
         width: xyz[1].toString(),
@@ -263,6 +271,12 @@ arrayOfChar.forEach((value) => {
     switch (ws[value + '3'].v) {
         case 'Цена до скидки, руб.':
             exel.Old = value + '3'
+            break
+        case 'Ссылка на главное фото*':
+            exel.MainPhoto = value + '3'
+            break
+        case 'Ссылки на дополнительные фото':
+            exel.OtherPhotos = value + '3'
             break
         case '№':
             exel.Numb = value + '3'
@@ -451,6 +465,21 @@ for (var i = 1; i <= toys.length; i++){
             newWS[exel.Numb[0] + `${i + 3}`] = {v :i}
     }
     }
+    if (exel.MainPhoto) {
+        if(exel.MainPhoto[2]){
+            newWS[exel.MainPhoto[0] + exel.MainPhoto[1] + `${i + 3}`] = {v :toys[i - 1].mainPhoto}
+        }else{
+            newWS[exel.MainPhoto[0] + `${i + 3}`] = {v :toys[i - 1].mainPhoto}
+    }
+    }
+    if (exel.OtherPhotos) {
+        if(exel.OtherPhotos[2]){
+            newWS[exel.OtherPhotos[0] + exel.OtherPhotos[1] + `${i + 3}`] = {v :toys[i - 1].otherPhotos}
+        }else{
+            newWS[exel.OtherPhotos[0] + `${i + 3}`] = {v :toys[i - 1].otherPhotos}
+    }
+    }
+    
 }
 xlsx.utils.book_append_sheet(wb, newWS)
 xlsx.writeFile(wb, "finalTable.xlsx")
@@ -509,10 +538,10 @@ async function beautyNum(number, jopa = false){
 
 async function getHrefCard(html){
     const $ = cheerio.load(html)
-    $("a[class='An AM']").each( function huy(){
+    $(`a[class='${bigLinkClass}']`).each( function huy(){
        
         var link = $(this).attr("href")
-        console.log(link);
+       
        links.push(link)
        
     })
@@ -532,37 +561,35 @@ async function getClassValues(ws){
   const link = ws['A2'].v
   const nameToy = ws['B2'].v
   const artikul = 'Артикул'
-//   ws['C2'].v
   const photoLink = ws['D2'].v
   const price = ws['E2'].v
-  const toyStats = ws['F2'].v
   const bigLink =ws['G2'].v
+  const description = ws['H2'].v
   
   var bigContent = await getPageContent(bigLink)
-  var bigLinkClass = bigContent.split(link)[2]
-  bigLinkClass = bigLinkClass.split(`"`)[2]
+
+  var bigLinkClass1 = bigContent.split(link)[2]
+  bigLinkClass = bigLinkClass1.split(`"`)[2]
 
   var content = await getPageContent(link)
-  var nameClass = content.split(nameToy)[content.split(nameToy).length - 2]
-  nameClass = nameClass.split(`"`)[nameClass.split(`"`).length - 2]
-//   const $ = cheerio.load(content)
-//   var n = $('._7J').first().text()
-// //   var g = [
-// // ]
-// //   $("img[class='_6_7']").each( function huy(){
-// //     var photoURL = $(this).attr("src")
-// //     g.push(photoURL)
-// //    console.log(g);
-// // })
-//   console.log(n);
-  var artikulClass = content.split(artikul)[0].split(`<div>`)[content.split(artikul)[0].split(`<div>`).length - 1]
-  artikulClass = artikulClass.split(`"`)[3]
-  var photoLinkClass = content.split(photoLink)[content.split(photoLink).length-2]
-  photoLinkClass = photoLinkClass.split(`"`)[photoLinkClass.split(`"`).length - 3]
-  var priceClass = '4 799&nbsp;₽'
-  priceClass = content.split(priceClass)[0]
-//   priceClass = priceClass.split(`"`)[priceClass.split(`"`).length - 2]
-  console.log(priceClass);
+
+  var nameClass1 = content.split(nameToy)[content.split(nameToy).length - 2]
+  nameClass = nameClass1.split(`"`)[nameClass1.split(`"`).length - 2]
+
+  var toyStatsClass1 = content.split('Страна-производитель')[0]
+  toyStatsClass = toyStatsClass1.split(`"`)[toyStatsClass1.split(`"`).length - 6]
+
+  var artikulClass1 = content.split(artikul)[0].split(`<div>`)[content.split(artikul)[0].split(`<div>`).length - 1]
+  artikulClass = artikulClass1.split(`"`)[3]
+
+  var photoLinkClass1 = content.split(photoLink)[content.split(photoLink).length-2]
+  photoLinkClass = photoLinkClass1.split(`"`)[photoLinkClass1.split(`"`).length - 3]
+
+  var priceClass1 = content.split(price)[0].split(`"`)[content.split(price)[0].split(`"`).length -2]
+  priceClass = priceClass1
+  
+  var descriptionClass1 = content.split(description)[0]
+  descriptionClass = descriptionClass1.split(`"`)[descriptionClass1.split(`"`).length - 2]
   
 
 }
