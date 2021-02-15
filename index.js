@@ -36,7 +36,7 @@ const LAUNCH_PUPPETEER_OPTS = {
   };
 
 var site = process.argv[2]
-var page = 'page/3'
+var page = 'page/6'
 var toys = []
 var finalPrice = 0
 var finalOldPrice = 0
@@ -134,7 +134,8 @@ async function toysParams(html){
     var length = b[1] + '0'
     var width = b[2] + '0'
     var x = toyStats.split('Вес упаковки')
-    var y = (parseInt(parseFloat(x[1].replace(/[^,\d]/g,'').replace(/,/g,'.')) * 1000)).toString()
+    var y = (Math.trunc(parseFloat(x[1].split('кг')[0].replace(/[^,\d]/g,'').replace(/,/g,'.')) * 1000)).toString()
+    console.log(y);
     var weight = y
     var xyz = [parseInt(length), parseInt(width), parseInt(height)]
     xyz.sort((a, b)=> b - a)
@@ -192,7 +193,7 @@ async function toysParams(html){
     }else{
         oldPrice = oldPrice * 1.05
     }
-    // oldPrice = parseInt(oldPrice)
+    oldPrice = Math.trunc(oldPrice)
     switch(color.substring(0,3)){
         case 'раз':
             color = 'разноцветный'
@@ -520,13 +521,12 @@ async function round(number, pezda = false){
 
 async function beautyNum(number, jopa = false){
     number = parseInt(number)
-    if((number % 10) > 5){
-        while((number % 10) != 9){
+        while(Math.trunc((number % 100) / 10) != 9){
             number++
         }
-    }else {
-        while((number % 10) != 9){
-            number--
+        if(number % 10 != 0){
+        while((number % 10 != 9)){
+            number ++
         }
     }
     if(jopa){
@@ -534,6 +534,7 @@ async function beautyNum(number, jopa = false){
     }else{
     finalPrice = number.toString()
     }
+   
 }
 
 async function getHrefCard(html){
@@ -541,8 +542,11 @@ async function getHrefCard(html){
     $(`a[class='${bigLinkClass}']`).each( function huy(){
        
         var link = $(this).attr("href")
-       
-       links.push(link)
+       if(links.includes(link)){
+       }else{
+        links.push(link)
+       }
+     
        
     })
 }
@@ -579,24 +583,26 @@ async function getClassValues(ws){
   var toyStatsClass1 = content.split('Страна-производитель')[0]
   toyStatsClass = toyStatsClass1.split(`"`)[toyStatsClass1.split(`"`).length - 6]
 
-  var artikulClass1 = content.split(artikul)[0].split(`<div>`)[content.split(artikul)[0].split(`<div>`).length - 1]
-  artikulClass = artikulClass1.split(`"`)[3]
+  var artikulClass1 = content.split(artikul)[0]
+  artikulClass = artikulClass1.split(`"`)[artikulClass1.split(`"`).length - 50]
 
   var photoLinkClass1 = content.split(photoLink)[content.split(photoLink).length-2]
   photoLinkClass = photoLinkClass1.split(`"`)[photoLinkClass1.split(`"`).length - 3]
 
-  var priceClass1 = content.split(price)[0].split(`"`)[content.split(price)[0].split(`"`).length -2]
-  priceClass = priceClass1
+  var priceClass1 = content.split(price)[0]
+  priceClass = priceClass1.split(`"`)[priceClass1.split(`"`).length -2]
   
   var descriptionClass1 = content.split(description)[0]
   descriptionClass = descriptionClass1.split(`"`)[descriptionClass1.split(`"`).length - 2]
   
-
 }
 
 var vv = `5.10.15
 TM
 Штучки, к которым тянутся ручки
+luffy 
+luffy mily
+ТМ Fluffy
 4Moms
 1TOY
 101 Dalmatians
