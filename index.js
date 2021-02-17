@@ -6,6 +6,7 @@ const fs = require("fs");
 
 const xlsx = require('xlsx')
 var wb = xlsx.readFile(process.argv[3])
+const newWB = wb
 var ws = wb.Sheets['Шаблон для поставщика']
 
 var initWB = xlsx.readFile('initValues.xlsx')
@@ -102,7 +103,6 @@ async function toysParams(html){
     })
     na = na.replace(/[A-Z]/g, '')
     var name = na
-    var artikul = $(`.${artikulClass}`).text()
     var pht = []
     $(`img[class='${photoLinkClass}']`).each( function huy(){
         var photoURL = $(this).attr("src")
@@ -134,6 +134,9 @@ async function toysParams(html){
     var length = b[1] + '0'
     var width = b[2] + '0'
     var x = toyStats.split('Вес упаковки')
+    var preArt = toyStats.split('Артикул')[1]
+    console.log(toyStats);
+    preArt = preArt.split('Код товара')[0]
     var y = (Math.trunc(parseFloat(x[1].split('кг')[0].replace(/[^,\d]/g,'').replace(/,/g,'.')) * 1000)).toString()
     var weight = y
     if (length == 'undefined0' || width == 'undefined0' || height == 'undefined0' ){
@@ -255,7 +258,7 @@ async function toysParams(html){
     }
     toys.push({
         name,
-        newArt: '111' + newArt,
+        newArt: '111' + preArt,
         price: finalPrice, 
         NDS,
         comerType,
@@ -352,9 +355,9 @@ const newWS = ws
 for (var i = 1; i <= toys.length; i++){
     if(exel.Old){
         if(exel.Old[2]){
-            newWS[exel.Old[0] + exel.Old[1] + `${i + 3}`] = {v: toys[i -1].oldPrice}
+            newWS[exel.Old[0] + exel.Old[1] + `${i + 3}`] = {v: 'пизда'}
         }else{
-            newWS[exel.Old[0] + `${i + 3}`] = {v: toys[i -1].oldPrice}
+            newWS[exel.Old[0] + `${i + 3}`] = {v: 'пизда'}
         }
     }
 
@@ -492,8 +495,9 @@ for (var i = 1; i <= toys.length; i++){
     }
     
 }
-xlsx.utils.book_append_sheet(wb, newWS)
-xlsx.writeFile(wb, "finalTable.xlsx")
+console.log(newWS['B5'].v + 'ПИЗДА');
+xlsx.utils.book_append_sheet(newWB, newWS)
+xlsx.writeFile(newWB, "finalTable.xlsx")
 
 }
 
@@ -593,8 +597,6 @@ async function getClassValues(ws){
   var toyStatsClass1 = content.split('Страна-производитель')[0]
   toyStatsClass = toyStatsClass1.split(`"`)[toyStatsClass1.split(`"`).length - 6]
 
-  var artikulClass1 = content.split(artikul)[0]
-  artikulClass = artikulClass1.split(`"`)[artikulClass1.split(`"`).length - 50]
 
   var photoLinkClass1 = content.split(photoLink)[content.split(photoLink).length-2]
   photoLinkClass = photoLinkClass1.split(`"`)[photoLinkClass1.split(`"`).length - 3]
