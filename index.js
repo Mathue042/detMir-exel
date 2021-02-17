@@ -36,7 +36,7 @@ const LAUNCH_PUPPETEER_OPTS = {
   };
 
 var site = process.argv[2]
-var page = 'page/6'
+var page = 'page/1'
 var toys = []
 var finalPrice = 0
 var finalOldPrice = 0
@@ -135,8 +135,18 @@ async function toysParams(html){
     var width = b[2] + '0'
     var x = toyStats.split('Вес упаковки')
     var y = (Math.trunc(parseFloat(x[1].split('кг')[0].replace(/[^,\d]/g,'').replace(/,/g,'.')) * 1000)).toString()
-    console.log(y);
     var weight = y
+    if (length == 'undefined0' || width == 'undefined0' || height == 'undefined0' ){
+        if (length == 'undefined0'){
+            length = 0
+        }
+        if (width == 'undefined0'){
+            width = 0
+        }
+        if (height == 'undefined0'){
+            height = 0
+        }
+    }
     var xyz = [parseInt(length), parseInt(width), parseInt(height)]
     xyz.sort((a, b)=> b - a)
     var color = 'разноцветный'
@@ -566,7 +576,7 @@ async function getClassValues(ws){
   const nameToy = ws['B2'].v
   const artikul = 'Артикул'
   const photoLink = ws['D2'].v
-  const price = ws['E2'].v
+  var price = ws['E2'].v
   const bigLink =ws['G2'].v
   const description = ws['H2'].v
   
@@ -589,8 +599,14 @@ async function getClassValues(ws){
   var photoLinkClass1 = content.split(photoLink)[content.split(photoLink).length-2]
   photoLinkClass = photoLinkClass1.split(`"`)[photoLinkClass1.split(`"`).length - 3]
 
-  var priceClass1 = content.split(price)[0]
-  priceClass = priceClass1.split(`"`)[priceClass1.split(`"`).length -2]
+  price = price.toString()
+  if (price.length > 3){
+      var tok = price[price.length - 3] 
+  }
+  price =  price.split(tok)[0]+' '+ tok+price.split(tok)[1]
+  var priceClass1 = content.split(price)[0].split(`"`)[content.split(price)[0].split(`"`).length -2]
+  priceClass = priceClass1
+
   
   var descriptionClass1 = content.split(description)[0]
   descriptionClass = descriptionClass1.split(`"`)[descriptionClass1.split(`"`).length - 2]
