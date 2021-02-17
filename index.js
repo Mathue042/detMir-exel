@@ -109,7 +109,6 @@ async function toysParams(html){
        pht.push(photoURL)
     })
     photos.push(pht)
-    var newArt= artikul.substring(artikul.indexOf("К"), artikul.indexOf("л")+2)
     var price = $(`.${priceClass}`)
     .first()
     .text()
@@ -135,7 +134,6 @@ async function toysParams(html){
     var width = b[2] + '0'
     var x = toyStats.split('Вес упаковки')
     var preArt = toyStats.split('Артикул')[1]
-    console.log(toyStats);
     preArt = preArt.split('Код товара')[0]
     var y = (Math.trunc(parseFloat(x[1].split('кг')[0].replace(/[^,\d]/g,'').replace(/,/g,'.')) * 1000)).toString()
     var weight = y
@@ -355,9 +353,9 @@ const newWS = ws
 for (var i = 1; i <= toys.length; i++){
     if(exel.Old){
         if(exel.Old[2]){
-            newWS[exel.Old[0] + exel.Old[1] + `${i + 3}`] = {v: 'пизда'}
+            newWS[exel.Old[0] + exel.Old[1] + `${i + 3}`] = {v: toys[i-1].oldPrice}
         }else{
-            newWS[exel.Old[0] + `${i + 3}`] = {v: 'пизда'}
+            newWS[exel.Old[0] + `${i + 3}`] = {v: toys[i-1].oldPrice}
         }
     }
 
@@ -492,16 +490,12 @@ for (var i = 1; i <= toys.length; i++){
         }else{
             newWS[exel.OtherPhotos[0] + `${i + 3}`] = {v :toys[i - 1].otherPhotos}
     }
-    }
-    
+    }   
 }
-console.log(newWS['B5'].v + 'ПИЗДА');
 xlsx.utils.book_append_sheet(newWB, newWS)
 xlsx.writeFile(newWB, "finalTable.xlsx")
-
 }
 
-// wK w_8
 async function round(number, pezda = false){
     number = parseInt(number)
    
