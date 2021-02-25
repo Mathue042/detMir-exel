@@ -2,6 +2,7 @@ const cheerio = require('cheerio');
 const puppeteer = require('puppeteer');
 const chalk = require('chalk');
 const fs = require("fs");
+var shortUrl = require('node-url-shortener');
 // require('events').EventEmitter.defaultMaxListeners = Infinity;
 
 const xlsx = require('xlsx')
@@ -104,11 +105,27 @@ async function toysParams(html){
     na = na.replace(/[A-Z]/g, '')
     var name = na
     var pht = []
+    var newPht = []
     $(`img[class='${photoLinkClass}']`).each( function huy(){
         var photoURL = $(this).attr("src")
-       pht.push(photoURL)
+        if (photoURL.includes('/1500/')){
+            pht.push(photoURL)
+        }
     })
-    photos.push(pht)
+
+    var l = 0
+    var mainPhoto = []
+    while (l<pht.length-1){
+        shortUrl.short(pht[l], function(err, url){
+            newPht.push(url)
+            if(newPht.length < 2){
+                mainPhoto.push(url)
+            }
+        });
+        l++
+        
+    }
+    photos.push(newPht)
     var price = $(`.${priceClass}`)
     .first()
     .text()
@@ -151,7 +168,7 @@ async function toysParams(html){
     var xyz = [parseInt(length), parseInt(width), parseInt(height)]
     xyz.sort((a, b)=> b - a)
     var color = 'разноцветный'
-    var age = 'для всех возростов'
+    var age = 'для всех возрастов'
     var description = $(`.${descriptionClass}`).text()
     ages.forEach(el=>{
         if (description.includes(el)){
@@ -159,6 +176,12 @@ async function toysParams(html){
         }
     })
     price = round(price)
+    var ozonPrice = parseInt(finalPrice)
+    if (ozonPrice % 100 != 0){
+        while (ozonPrice % 100 != 0){
+            ozonPrice = ozonPrice -1
+        }
+    }
     exceptionDictionary.forEach(el=>{
         if (description.includes(el)){
             var ind = description.indexOf(el)
@@ -254,6 +277,17 @@ async function toysParams(html){
                 color = 'фиолетовый'
                 break
     }
+    if(name.split(preArt)[1]){
+        if(name.split(preArt)[0]){
+            name = name.split(preArt)[0] + name.split(preArt)[1]
+        }else{
+            name = name.split(preArt)[1]
+        }
+    }else{
+        if(name.split(preArt)[0]){
+            name = name.split(preArt)[0]
+        }
+    }
     toys.push({
         name,
         newArt: '111' + preArt,
@@ -261,7 +295,7 @@ async function toysParams(html){
         NDS,
         comerType,
         description: description.split(toyStats)[0],
-        mainPhoto: photos[photos.length -1][0],
+        mainPhoto,
         otherPhotos: photos[photos.length -1],
         height: xyz[2].toString(),
         length: xyz[0].toString(),
@@ -270,6 +304,7 @@ async function toysParams(html){
         color,
         age,
         oldPrice,
+        ozonPrice,
         toyH: (parseInt(toyH)/10).toString()
     })
 }
@@ -342,6 +377,9 @@ arrayOfChar.forEach((value) => {
         case 'Высота игрушки, см':
             exel.ToyH = value + '3'
             break
+        case 'Цена с Ozon Premium, руб.':
+            exel.OzonPrice = value + '3'
+            break
     }
 }
 })
@@ -364,6 +402,14 @@ for (var i = 1; i <= toys.length; i++){
             newWS[exel.Price[0] + exel.Price[1] + `${i + 3}`] = {v: toys[i -1].price}
         }else{
             newWS[exel.Price[0] + `${i + 3}`] = {v: toys[i -1].price}
+        }
+    }
+
+    if(exel.OzonPrice){
+        if(exel.OzonPrice[2]){
+            newWS[exel.OzonPrice[0] + exel.OzonPrice[1] + `${i + 3}`] = {v: toys[i -1].ozonPrice}
+        }else{
+            newWS[exel.OzonPrice[0] + `${i + 3}`] = {v: toys[i -1].ozonPrice}
         }
     }
 
@@ -559,7 +605,6 @@ async function getHrefCard(html){
     })
 }
 
-
 async function getPageContent(uri){
     const browser = await puppeteer.launch(LAUNCH_PUPPETEER_OPTS)
     const lilPage = await browser.newPage(PAGE_PUPPETEER_OPTS)
@@ -607,6 +652,13 @@ async function getClassValues(ws){
   var descriptionClass1 = content.split(description)[0]
   descriptionClass = descriptionClass1.split(`"`)[descriptionClass1.split(`"`).length - 2]
   
+//   console.log(bigLinkClass);
+//   console.log(nameClass);
+//   console.log(toyStatsClass);
+//   console.log(photoLinkClass);
+//   console.log(priceClass);
+//   console.log(descriptionClass);
+
 }
 
 var vv = `5.10.15
@@ -617,6 +669,7 @@ luffy mily
 ТМ Fluffy
 4Moms
 1TOY
+Bburago
 101 Dalmatians
 101 Далматинец
 7DAYS

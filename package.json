@@ -15,6 +15,7 @@
     "@babel/preset-env": "^7.12.11",
     "chalk": "^4.1.0",
     "cheerio": "^1.0.0-rc.5",
+    "node-url-shortener": "^1.1.11",
     "puppeteer": "^5.5.0",
     "xlsx": "^0.16.9"
   }
