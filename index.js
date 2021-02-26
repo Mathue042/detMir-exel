@@ -38,7 +38,7 @@ const LAUNCH_PUPPETEER_OPTS = {
   };
 
 var site = process.argv[2]
-var page = 'page/9'
+var page = 'page/1'
 var toys = []
 var finalPrice = 0
 var finalOldPrice = 0
@@ -94,15 +94,13 @@ main()
 
 async function toysParams(html){
     const $ = cheerio.load(html)
-    var n = $(`.${nameClass}`).first().text()
-    var na = n.replace(/[0-9]/g, '');
+    var na = $(`.${nameClass}`).first().text()
     exceptionDictionary.forEach(el=>{
         if (na.includes(el)){
             na = na.split(el)
             na = na[0]+na[1]
         }
     })
-    na = na.replace(/[A-Z]/g, '')
     var name = na
     var pht = []
     var newPht = []
