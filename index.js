@@ -38,7 +38,7 @@ const LAUNCH_PUPPETEER_OPTS = {
   };
 
 var site = process.argv[2]
-var page = 'page/1'
+var page = 'page/9'
 var toys = []
 var finalPrice = 0
 var finalOldPrice = 0
@@ -115,7 +115,7 @@ async function toysParams(html){
 
     var l = 0
     var mainPhoto = []
-    while (l<pht.length-1){
+    while (l<pht.length){
         shortUrl.short(pht[l], function(err, url){
             newPht.push(url)
             if(newPht.length < 2){
