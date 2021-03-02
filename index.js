@@ -115,14 +115,17 @@ async function toysParams(html){
     var mainPhoto = []
     while (l<pht.length){
         shortUrl.short(pht[l], function(err, url){
-            newPht.push(url)
+            if(typeof url != 'undefined'){
+                newPht.push(url)
+            }
             if(newPht.length < 2){
                 mainPhoto.push(url)
             }
         });
         l++
-        
     }
+    
+    console.log(photos);
     photos.push(newPht)
     var price = $(`.${priceClass}`)
     .first()
@@ -175,6 +178,17 @@ async function toysParams(html){
     })
     price = round(price)
     var ozonPrice = parseInt(finalPrice)
+    if (ozonPrice<1000){
+        ozonPrice = ozonPrice - 50
+    }else{
+        if(ozonPrice<5000){
+            ozonPrice = ozonPrice - 300
+        }else{
+            if (ozonPrice<15000){
+                ozonPrice = ozonPrice - 1000
+            }
+        }
+    }
     if (ozonPrice % 100 != 0){
         while (ozonPrice % 100 != 0){
             ozonPrice = ozonPrice -1
@@ -191,24 +205,12 @@ async function toysParams(html){
             // }
         }
     })
-    // contryDictionary.forEach(el=>{
-    //     if (description.includes(el)){
-    //         var ind = description.indexOf(el)
-    //         description = description.split(el)
-    //         description = description[0]+description[1]
-    //     }
-    // })
-    // contryDictionary.forEach(el=>{
-    //     if (description.includes(el)){
-    //         var ind = description.indexOf(el)
-    //         description = description.split(el)
-    //         description = description[0]+description[1]
-    //         // while(description[ind-k]!=' '){
-    //         //     description = description.split(description[ind-k])[0]+description.split(description[ind-k])[1]
-    //         //     k++
-    //         // }
-    //     }
-    // })
+    contryDictionary.forEach(el=>{
+        if (description.includes(el)){
+            description = description.split(el)
+            description = description[0]+description[1]
+        }
+    })
     colors.forEach(el=>{
         if(description.includes(el)){
             color = el
@@ -5140,10 +5142,12 @@ var countrys =
 Австрии
 Австрию
 Австрией
+Австрийский
 Албания
 Албании
 Албанию
 Албанией
+Албанский
 Андорра
 Андорры
 Андорре
@@ -5153,12 +5157,14 @@ var countrys =
 Белоруссии
 Белоруссию
 Белоруссией
+Белорусский
 Бельгия
 Бельгии
 Бельгию
 Болгария
 Болгарии
 Болгарию
+Болгарский
 Босния и Герцеговина
 Боснии и Герцеговины
 Боснии и Герцеговине
@@ -5167,101 +5173,132 @@ var countrys =
 Ватикана
 Ватикану
 Ватикан
+Ватиканский
 Великобритания
 Великобритании
 Великобритании
+Английский
 Венгрия
 Венгрии
 Венгрию
+Венгерский
 Германия
 Германии
 Германию
+Германский
 Греция
 Греции
 Грецию
+Греческий
 Дания
 Дании
 Данию
+Датский
 Исландия
 Исландии
 Исландию
+Исландский
 Испания
 Испании
 Испанию
+Испанский
 Италия
 Италии
 Италию
+Итальянский
 Латвия
 Латвии
 Латвию
+Латвийский
 Литва
 Литвы
 Литве
 Литву
+Литовский
 Нидерланды
 Нидерландов
 Нидерландам
 Нидерланды
 Нидерландах
+Нидерландский
+Голандский
 Норвегия
 Норвегии
 Норвегию
+Норвежский
 Польша
 Польши
 Польше
 Польшу
+Польский
 Португалия
 Португалии
 Португалию
 Португалией
+Португальский
 Румыния
 Румынии
 Румынию
+Румынский
 Украина
 Украины
 Украине
+Украинский
 Финляндия
 Финляндии
 Финляндию
+Финский
 Франция
 Франции
 Францию
+Французский
 Хорватия
 Хорватии
 Хорватию
+Хорватский
 Черногория
 Черногории
 Черногорию
+Черногорский
 Чехия
 Чехии
 Чехию
+Чешский
 Швейцария
 Швейцарии
 Швейцарию
+Шведский
 Ирландия
 Ирландии
 Ирландию
+Ирландский
 Япония
 Японии
 Японию
+Японский
 Китай
 Китая
 Китаю
+Китайский
 Индия
 Индии
 Индию
+Индусский
 Корея
 Кореи
 Корею
 Корее
+Корейский
 США
 Канада
 Канады
 Канаду
 Канаде
+Канадский
 Казахстан
 Казахстана
 Казахстану
+Казахстанский
 `
 var colors = [
     'розовый','розового','розовому','розовым','розовом','розовые','розовых','розовыми','розовая','розовой','розовую','розовое',
