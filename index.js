@@ -125,7 +125,6 @@ async function toysParams(html){
         l++
     }
     
-    console.log(photos);
     photos.push(newPht)
     var price = $(`.${priceClass}`)
     .first()
@@ -641,10 +640,16 @@ async function getClassValues(ws){
   photoLinkClass = photoLinkClass1.split(`"`)[photoLinkClass1.split(`"`).length - 3]
 
   price = price.toString()
-  if (price.length > 3){
-      var tok = price[price.length - 3] 
+  var v = 0
+  var rarPr = ''
+  while (v != price.length){
+    if ((rarPr.length < 2) && (rarPr.length > 0)){
+        rarPr = rarPr + ' '
+    }
+    rarPr = rarPr + price[v]
+    v++
   }
-  price =  price.split(tok)[0]+' '+ tok+price.split(tok)[1]
+  price = rarPr
   var priceClass1 = content.split(price)[0].split(`"`)[content.split(price)[0].split(`"`).length -2]
   priceClass = priceClass1
 
@@ -5136,12 +5141,7 @@ ZINC
 Яблоков
 Я-художник
 Ёбатон`
-var countrys = 
-`
-Австрия
-Австрии
-Австрию
-Австрией
+var countrys = `Австрией
 Австрийский
 Албания
 Албании
@@ -5165,10 +5165,6 @@ var countrys =
 Болгарии
 Болгарию
 Болгарский
-Босния и Герцеговина
-Боснии и Герцеговины
-Боснии и Герцеговине
-Боснию и Герцеговину
 Ватикан
 Ватикана
 Ватикану
@@ -5298,8 +5294,7 @@ var countrys =
 Казахстан
 Казахстана
 Казахстану
-Казахстанский
-`
+Казахстанский`
 var colors = [
     'розовый','розового','розовому','розовым','розовом','розовые','розовых','розовыми','розовая','розовой','розовую','розовое',
     'черный','черного','черному','черным','черном','черные','черных','черными','черная','черной','черную','черное',
